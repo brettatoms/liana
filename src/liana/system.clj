@@ -16,13 +16,13 @@
 (defn config [& {:keys [profile]
                  :or {profile :default}
                  :as opts}]
-  ;; TODO: add a spec here for opts
   (let [profile-opts (reduce-kv #(assoc %1 %2 (get %3 profile (get %3 :default)))
                                 {} profile-defaults)
         opts (merge profile-opts opts)]
     {:liana.core/router
      {:cookie-secret (:router/cookie-secret opts)
-      :request-context {}
+      :request-context (merge {:db (ig/ref :liana.db/pool)}
+                              (:router/request-context opts))
       :routes (:router/routes opts)
       :defaults (:router/router opts)}
 
@@ -32,6 +32,10 @@
 
      :liana.core/app
      {:router (ig/ref :liana.core/router)}
+
+     :liana.db/pool
+     {:db-spec (:db/spec opts)
+      :jdbc-options (:db/options opts)}
 
      :liana.core/server
      {:port (:server/port opts)
