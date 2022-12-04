@@ -39,8 +39,10 @@
                                (r.ring/create-default-handler)
                                (r.ring/redirect-trailing-slash-handler {:method :strip}))))
 
-(defmethod ig/init-key ::server [_ {:keys [port router]}]
-  (jetty/run-jetty router
+(defmethod ig/init-key ::server [_ {:keys [app port]}]
+  ;; TODO: Allow passing any jetty options from, see
+  ;; https://github.com/sunng87/ring-jetty9-adapter/blob/e606b98264ee309cd25553df16423cfd8988a24e/src/ring/adapter/jetty9.clj#L262
+  (jetty/run-jetty app
                    {:port port
                     :join? false}))
 

@@ -13,7 +13,9 @@
                          :test false}
    :server/port {:default 3000}})
 
-(defn config [profile & {:keys [] :as opts}]
+(defn config [& {:keys [profile]
+                 :or {profile :default}
+                 :as opts}]
   ;; TODO: add a spec here for opts
   (let [profile-opts (reduce-kv #(assoc %1 %2 (get %3 profile (get %3 :default)))
                                 {} profile-defaults)
@@ -33,7 +35,7 @@
 
      :liana.core/server
      {:port (:server/port opts)
-      :router (ig/ref :liana.core/router)}}))
+      :app (ig/ref :liana.core/app)}}))
 
 (defn start [& {:as opts}]
   (let [cfg (config opts)]
