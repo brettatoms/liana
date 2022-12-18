@@ -1,6 +1,6 @@
-# liana/liana
+# Liana
 
-FIXME: my new library.
+The boring Clojure web framework.
 
 ## Usage
 

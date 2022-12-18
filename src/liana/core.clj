@@ -18,14 +18,17 @@
 
 (defmethod ig/init-key ::router [_ {:keys [defaults request-context routes cookie-secret]}]
   (let [cookie-store-options {:key (.getBytes cookie-secret)}
+        ;; TODO: This makes it hard to override these defaults. We should
+        ;; probably set these up ourself instead of using the ring-defaults
+        ;; package
         defaults (-> {:site defaults/site-defaults
                       :secure-site defaults/secure-site-defaults
                       :api defaults/api-defaults
                       :secure-api defaults/secure-api-defaults}
-                     (get defaults)
+                     (get defaults :secure-site)
                      (assoc-in [:session :store]
                                (cookie-store cookie-store-options)))
-        router-options {:data {:middleware [;; [middleware/exception-middleware]
+        router-options {:data {:middleware [[middleware/exception-middleware]
                                             [defaults/wrap-defaults defaults]
                                             [middleware/wrap-request-context request-context]
                                             [middleware/wrap-coerce-response]
@@ -35,7 +38,8 @@
     (r.ring/router routes router-options)))
 
 (defmethod ig/init-key ::app [_ {:keys [router]}]
-  (r.ring/ring-handler router (r.ring/routes ;(r.ring/create-resource-handler {:path "/"})
+  (r.ring/ring-handler router (r.ring/routes
+                               (r.ring/create-resource-handler {:path "/"})
                                (r.ring/create-default-handler)
                                (r.ring/redirect-trailing-slash-handler {:method :strip}))))
 

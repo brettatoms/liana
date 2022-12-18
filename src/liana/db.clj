@@ -1,8 +1,7 @@
-(ns liana.db.core
+(ns liana.db
   (:require  [integrant.core :as ig]
              [next.jdbc :as jdbc]
              [next.jdbc.connection :as jdbc.connection]))
-
 
 (defmethod ig/init-key ::pool [_ {:keys [db-spec jdbc-options]}]
   (when db-spec
